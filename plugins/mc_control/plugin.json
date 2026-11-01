@@ -1,0 +1,5 @@
+{
+  "api": "v1",
+  "description": "明确 @ 指令进入 Minecraft 白名单任务队列",
+  "requires": ["group.text.receive", "group.text.send", "group.text.mention"]
+}

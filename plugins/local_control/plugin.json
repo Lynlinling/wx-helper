@@ -1,0 +1,5 @@
+{
+  "api": "v1",
+  "description": "本机动作提案、诏书审批、固定应用启动和限定工作区 Codex 只读查询；默认关闭",
+  "requires": ["group.text.receive", "group.text.send", "group.text.mention"]
+}

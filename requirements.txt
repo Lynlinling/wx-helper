@@ -1,0 +1,3 @@
+pefile==2023.2.7
+pywinauto==0.6.9
+comtypes==1.4.17

@@ -1,0 +1,5 @@
+{
+  "api": "v1",
+  "description": "Minecraft 重要事件低频主动播报",
+  "requires": ["group.text.receive", "group.text.send"]
+}

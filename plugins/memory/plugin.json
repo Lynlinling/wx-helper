@@ -1,0 +1,7 @@
+{
+  "name": "memory",
+  "api": "v1",
+  "description": "按账号和群隔离的热、温、冷聊天记忆",
+  "entry": "__init__.py",
+  "requires": ["group.text.receive", "group.text.send"]
+}

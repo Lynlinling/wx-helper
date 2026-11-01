@@ -1,0 +1,44 @@
+{
+  "routes": [
+    {
+      "name": "fast-chat",
+      "tier": "fast",
+      "base_url": "https://api.example.com/v1",
+      "protocol": "openai_chat",
+      "endpoint_path": "/chat/completions",
+      "api_key_env": "LLM_FAST_API_KEY",
+      "api_key_optional": false,
+      "model": "your-fast-model",
+      "timeout_seconds": 4,
+      "max_tokens": 256,
+      "context_limit": 1000000,
+      "temperature": null,
+      "top_p": null,
+      "presence_penalty": null,
+      "frequency_penalty": null,
+      "pricing": {}
+    },
+    {
+      "name": "planner",
+      "tier": "planner",
+      "base_url": "https://api.example.com/v1",
+      "protocol": "openai_chat",
+      "endpoint_path": "/chat/completions",
+      "api_key_env": "LLM_PLANNER_API_KEY",
+      "api_key_optional": false,
+      "model": "your-planner-model",
+      "timeout_seconds": 15,
+      "max_tokens": 512,
+      "context_limit": 1000000,
+      "temperature": null,
+      "top_p": null,
+      "presence_penalty": null,
+      "frequency_penalty": null,
+      "pricing": {}
+    }
+  ],
+  "router": {
+    "failure_threshold": 2,
+    "cooldown_seconds": 30
+  }
+}

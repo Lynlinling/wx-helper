@@ -1,0 +1,9 @@
+{
+  "database_file": ".runtime/member_data.sqlite3",
+  "history_enabled": true,
+  "daily_clear": true,
+  "default_personality": "鲸鱼娘",
+  "groups": {},
+  "group_labels": {},
+  "warm_retention_days": 30
+}
