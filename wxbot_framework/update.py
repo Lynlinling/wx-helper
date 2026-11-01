@@ -14,7 +14,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-REPO = "xueze-ai/wx-helper"
+REPO = "Lynlinling/wx-helper"
 USER_AGENT = "wx-helper-updater"
 MAX_DOWNLOAD_BYTES = 300 * 1024 * 1024
 

@@ -38,12 +38,12 @@ from wxbot_framework.usage import UsageStore
 
 APP_NAME = "微信机器人控制台"
 APP_TITLE = APP_NAME
-APP_VERSION = "1.2.0"
-APP_AUTHOR = "薛泽（Xue Ze）"
-APP_COPYRIGHT = "Copyright © 2026 薛泽（Xue Ze）"
-PROJECT_URL = "https://github.com/xueze-ai/wx-helper"
-PROJECT_REPO = "xueze-ai/wx-helper"
-DEFAULT_UPDATE_REPO = "xueze-ai/wx-helper"
+APP_VERSION = "1.3.0"
+APP_AUTHOR = "上游作者：薛泽（Xue Ze）；维护者：Lynlinling"
+APP_COPYRIGHT = "上游版权声明见 LICENSE"
+PROJECT_URL = "https://github.com/Lynlinling/wx-helper"
+PROJECT_REPO = "Lynlinling/wx-helper"
+DEFAULT_UPDATE_REPO = "Lynlinling/wx-helper"
 WECHAT_VERSION = "4.1.15.13"
 CONFIG_STEMS = ("bot_config", "members_config", "llm_config")
 DEFAULT_MEMBERS = {
@@ -261,6 +261,9 @@ class ControlPanel:
         self.startup_link = self._startup_link_path()
         self.editor_plugin = None
         self._closing = False
+        self._full_exit_requested = False
+        self.tray = None
+        self.pet = None
         self.stats_store = UsageStore(self.root_dir / ".runtime/llm_usage.sqlite3")
         self.update_info = None
         self.update_pending = self.prefs.get("pending_update") if isinstance(
@@ -279,6 +282,43 @@ class ControlPanel:
         self._refresh_stats()
         self._tick_stats()
         self.window.after(8000, self._auto_check_updates)
+
+    def attach_desktop_shell(self, tray_enabled=True, pet_enabled=True):
+        """Attach optional tray and desktop pet without blocking the main UI."""
+        try:
+            from wxbot_framework.tray import TrayController
+            self.tray = TrayController(self)
+            if tray_enabled:
+                self.tray.start()
+        except Exception:
+            logging.getLogger("GUI").exception("托盘初始化失败")
+        if pet_enabled:
+            try:
+                from wxbot_framework.desktop_pet import create_pet
+                self.pet = create_pet(self.window, on_open=self.show_window, on_exit=self.full_exit)
+            except Exception:
+                logging.getLogger("GUI").exception("桌宠初始化失败")
+
+    def show_window(self):
+        self.window.deiconify()
+        self.window.lift()
+        self.window.focus_force()
+
+    def hide_window(self):
+        self.window.withdraw()
+
+    def toggle_pet(self):
+        if self.pet is None:
+            return
+        if self.pet.window.state() == "withdrawn":
+            self.pet.show()
+        else:
+            self.pet.hide()
+
+    def full_exit(self):
+        self.show_window()
+        self._full_exit_requested = True
+        self._on_close()
 
     # -- 路径与偏好 --------------------------------------------------------
 
@@ -471,6 +511,17 @@ class ControlPanel:
             error = self.controller.last_error
         self.var_account.set(self.bot.get("wechat_account") or "自动识别唯一登录账号")
         self.var_error.set(error or "无")
+        if self.pet is not None:
+            if running and self.controller.connected:
+                self.pet.set_status("在线摸鱼")
+            elif running:
+                self.pet.set_status("等微信登录")
+            elif pending:
+                self.pet.set_status("等清理")
+            elif error:
+                self.pet.set_status("有点报错")
+            else:
+                self.pet.set_status("待命中")
         self.button_start.configure(state="disabled" if running or pending else "normal")
         self.button_stop.configure(state="normal" if running or pending else "disabled")
         self.var_footer.set(f"目录：{self.root_dir}    |    配置：{self.store.path}")
@@ -1524,7 +1575,7 @@ class ControlPanel:
             row=repo_row, column=0, sticky="w", pady=2)
         repo_box = ttk.Frame(content)
         repo_box.grid(row=repo_row, column=1, sticky="w", pady=2, padx=(6, 0))
-        ttk.Label(repo_box, text="github.com/xueze-ai/wx-helper").pack(side="left")
+        ttk.Label(repo_box, text="github.com/Lynlinling/wx-helper").pack(side="left")
         ttk.Button(repo_box, text="打开", width=6, command=self._open_project).pack(side="left", padx=8)
 
         architecture = ttk.LabelFrame(content, text="架构", padding=10)
@@ -2422,10 +2473,15 @@ class ControlPanel:
                        check=True, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
 
     def _on_close(self):
+        if not self._full_exit_requested and self.tray is not None and self.tray.icon is not None:
+            self._save_prefs()
+            self.hide_window()
+            return
         if self.controller.running or self.controller.needs_cleanup:
             if not messagebox.askyesno(
                     "退出",
                     "退出前需要安全停止（Quit）并卸载微信里的桥接 DLL。\n现在停止并退出吗？"):
+                self._full_exit_requested = False
                 return
             try:
                 self.controller.stop(timeout=45)
@@ -2433,10 +2489,15 @@ class ControlPanel:
                 messagebox.showerror(
                     "无法安全退出",
                     f"{error}\n\n请先点“清理残留桥接”，确认桥接 DLL 已卸载后再关闭窗口。")
+                self._full_exit_requested = False
                 self._refresh_status()
                 return
         self._closing = True
         self._save_prefs()
+        if self.pet is not None:
+            self.pet.destroy()
+        if self.tray is not None:
+            self.tray.stop()
         if self.update_pending:
             self._install_pending_update()
         self.window.destroy()
@@ -2468,10 +2529,11 @@ def main():
         messagebox.showerror(APP_TITLE, f"启动界面失败：\n{type(error).__name__}: {error}")
         window.destroy()
         return 1
-    if args.minimized:
-        window.after(200, window.iconify)
     if args.autostart or panel.prefs.get("auto_start"):
         window.after(600, panel._start_bot)
+    panel.attach_desktop_shell(tray_enabled=True, pet_enabled=True)
+    if args.minimized and panel.tray is not None and panel.tray.icon is not None:
+        panel.hide_window()
     window.mainloop()
     return 0
 

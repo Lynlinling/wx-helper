@@ -27,6 +27,8 @@ wx-helper 本体采用 [MIT License](LICENSE)。下面列出仓库中直接包�
 | pefile | 读取 PE 文件信息、辅助版本适配 | MIT | `requirements.txt` 中的唯一运行依赖 |
 | wechatauto-replica | `auto` 的本地数据库只读监听降级 | Apache-2.0 | 运行时从同级 `wechatauto-replica/` 工作区加载；未将其源码复制或打包进本仓库 |
 | PyInstaller | 构建 Windows EXE | GPL-2.0-or-later，含 bootloader 特殊例外 | 仅构建时需要；其输出不因此被 GPL 覆盖。见 <https://pyinstaller.org/en/stable/license.html> |
+| pystray | Windows 通知区域托盘 | LGPL-3.0-or-later | 运行时可选依赖；未安装时主界面仍可运行，但不显示托盘图标。 |
+| Pillow | 绘制托盘鲸鱼图标 | HPND | 仅绘制简单的程序化图标；不附带图片素材。 |
 
 本项目没有把 Python、Tcl/Tk、SQLite、pefile 或 PyInstaller 的源码复制进仓库。通过 PyInstaller 生成的 EXE 会包含 Python 运行时和上述部分组件，分发时请同时保留本说明，并遵守对应许可证。
 

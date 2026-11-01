@@ -51,6 +51,8 @@ Write-Host '开始 PyInstaller 构建…'
     --specpath $work `
     --hidden-import pefile `
     --hidden-import ctypes.wintypes `
+    --hidden-import pystray._win32 `
+    --collect-submodules pystray `
     --collect-submodules wxbot_framework `
     (Join-Path $root 'gui.py')
 if ($LASTEXITCODE -ne 0) { throw 'PyInstaller 构建失败' }
@@ -78,10 +80,14 @@ foreach ($name in @('filehelper_service.py', 'text_service.py', 'run_selftest.py
 }
 New-Item -ItemType Directory -Path (Join-Path $nativeDest 'build') -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $nativeDest 'build_text') -Force | Out-Null
-Copy-Item -LiteralPath (Join-Path $root 'native/build/selftest_bridge.dll') `
-    -Destination (Join-Path $nativeDest 'build')
-Copy-Item -LiteralPath (Join-Path $root 'native/build_text/text_bridge.dll') `
-    -Destination (Join-Path $nativeDest 'build_text')
+$fileHelperDll = Join-Path $root 'native/build/selftest_bridge.dll'
+$textDll = Join-Path $root 'native/build_text/text_bridge.dll'
+if ((Test-Path -LiteralPath $fileHelperDll) -and (Test-Path -LiteralPath $textDll)) {
+    Copy-Item -LiteralPath $fileHelperDll -Destination (Join-Path $nativeDest 'build')
+    Copy-Item -LiteralPath $textDll -Destination (Join-Path $nativeDest 'build_text')
+} else {
+    Write-Warning '未找到原生桥接 DLL；本次 EXE 仍可启动，但只能使用已配置的只读/兼容后端。需要免点击收发时，请先运行 native/build_bridges.ps1。'
+}
 
 # 首次运行由界面从 example 生成本地配置；不复制真实账号和密钥。
 foreach ($name in @('bot_config.example.json', 'members_config.example.json', 'llm_config.example.json',

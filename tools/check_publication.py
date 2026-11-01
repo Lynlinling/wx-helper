@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ALLOWED_DLLS = {'native/build_text/text_bridge.dll', 'native/build/selftest_bridge.dll'}
+LOCAL_BUILD_DIRS = {'build', 'dist'}
 SECRET_PATTERNS = {
     'possible_api_key': re.compile(r'(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]{16,}'),
     'possible_github_token': re.compile(r'(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{30,})'),
@@ -24,6 +25,10 @@ def inspect(root, private_markers=()):
     for path in sorted(root.rglob('*')):
         relative = path.relative_to(root)
         if '.git' in relative.parts:
+            continue
+        # Local PyInstaller output is gitignored and embeds machine-specific paths.
+        # It is a build artifact, not part of the publishable source tree.
+        if any(part in LOCAL_BUILD_DIRS for part in relative.parts):
             continue
         # Report private runtime directories without opening their contents.
         # Besides avoiding needless scans, this works while a live process holds

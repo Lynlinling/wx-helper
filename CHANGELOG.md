@@ -2,6 +2,11 @@
 
 本项目从 `1.2.0` 开始公开维护，版本号遵循 [Semantic Versioning](https://semver.org/)。
 
+## [1.3.0] - 2026-11-01（未发布）
+
+- 增加双击启动的通知区域托盘、完全退出菜单和不依赖鼠标点击的简易鲸鱼娘桌宠。
+- 更新公开仓库和自动更新地址为 `Lynlinling/wx-helper`。
+
 ## [1.2.0] - 2026-10-20
 
 ### 新增
@@ -28,4 +33,4 @@
 - 发布目录检查脚本；默认忽略本地配置、聊天数据库、日志和构建产物。
 - 183 个不连接微信的单元测试。
 
-[1.2.0]: https://github.com/xueze-ai/wx-helper/releases/tag/v1.2.0
+[1.2.0]: https://github.com/Lynlinling/wx-helper/releases/tag/v1.2.0

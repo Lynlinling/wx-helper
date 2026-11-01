@@ -24,6 +24,6 @@ wx-helper 的讨论区、Issue、Pull Request 和群聊应当保持专业、友�
 
 如果你遇到骚扰或隐私泄露，请通过仓库的私密安全报告渠道联系维护者，不要公开扩散敏感内容：
 
-<https://github.com/xueze-ai/wx-helper/security/advisories/new>
+<https://github.com/Lynlinling/wx-helper/security/advisories/new>
 
 本准则适用于项目相关的所有公开和私下交流场景。

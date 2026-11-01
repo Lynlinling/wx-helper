@@ -9,6 +9,7 @@
 ## 功能
 
 - Windows 图形控制台：配置后端、模型、插件、群白名单和发送保护。
+- 双击启动的 Windows 应用：通知区域托盘菜单、完全退出和简易 DeepSeek 鲸鱼娘桌宠；托盘/桌宠不模拟鼠标点击。
 - 多种消息后端：版本锁定的原生文本桥接；未匹配时可用数据库只读接收或 UI Automation 只读降级。
 - 群聊 @ 对话：结合发言者历史和近期群上下文，默认使用“DeepSeek//鲸鱼娘·大肥鱼”人格。
 - 私聊对话、群聊总结、成语接龙、群玩法、成员绑定和三层记忆。
@@ -22,6 +23,7 @@
 
 - Windows 10/11 x64；桌面交互后端需要已登录的 Windows 桌面会话。
 - Python 3.12 x64；源码启动需要 tkinter。
+- 托盘图标需要 `pystray` 和 Pillow；`requirements.txt` 会自动安装。桌宠使用 tkinter/Pillow 绘制，不需要额外图片文件。
 - 微信版本需与 `native/compatibility.json` 中的受支持指纹匹配，才可使用对应原生收发能力。其他版本可能只能接收或不能连接。
 - 需要 AI 功能时，准备一个与所选协议兼容的模型服务和密钥。
 
@@ -34,6 +36,8 @@ python -m pip install -r requirements.txt
 python tools\init_config.py
 python gui.py
 ```
+
+若使用打包版，双击 `wx-helper.exe` 即可启动。应用会在通知区域显示鲸鱼图标，关闭主窗口时默认收进托盘；从托盘菜单可以打开控制台、显示/隐藏桌宠、启动/停止机器人和“完全退出”。桌宠可拖动，双击桌宠可隐藏。源码环境未安装 `pystray` 时仍可运行主界面，但不会显示托盘图标。
 
 GitHub 源码发布不包含编译后的微信桥接 DLL。若要启用不依赖鼠标点击的原生文本收发，请在 **Visual Studio x64 Native Tools Command Prompt** 中进入项目目录并构建桥接：
 
@@ -135,6 +139,8 @@ python -m pip install -r requirements-build.txt
 .\native\build_bridges.ps1
 .\tools\build_exe.ps1
 ```
+
+默认生成目录版应用：`dist\wx-helper\wx-helper.exe`。构建完成后可直接双击该 EXE；`native` 桥接 DLL 存在时会一并打包。
 
 先运行完整测试，再检查打包后的目标文件；桥接二进制只应由你信任的构建流程产生。
 
